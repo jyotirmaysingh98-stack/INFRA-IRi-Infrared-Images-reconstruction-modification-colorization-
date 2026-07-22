@@ -1,0 +1,47 @@
+seed: 42
+
+data:
+  train_dir: "data/raw/train"
+  val_dir: "data/raw/val"
+  image_size: 256
+  channels_in: 1          # infrared input channels (1 = grayscale thermal)
+  channels_out: 3          # 3 = colorized RGB output, 1 = enhanced grayscale only
+  batch_size: 8
+  num_workers: 4
+  use_clahe: true
+  clahe_clip_limit: 2.0
+  clahe_tile_grid: 8
+  denoise: true
+
+model:
+  name: "unet"             # "unet" or "gan"
+  base_channels: 64
+  depth: 4
+  use_residual: true
+
+train:
+  epochs: 100
+  lr: 0.0002
+  beta1: 0.5
+  beta2: 0.999
+  weight_decay: 0.0001
+  loss_weights:
+    l1: 1.0
+    ssim: 1.0
+    perceptual: 0.5
+    edge: 0.5
+    adversarial: 0.1
+  save_every: 5
+  log_dir: "outputs/logs"
+  checkpoint_dir: "checkpoints"
+  sample_dir: "outputs/samples"
+  use_gan: false
+  device: "cuda"            # falls back to cpu automatically if unavailable
+
+infer:
+  checkpoint_path: "checkpoints/unet_best.pt"
+  output_dir: "outputs/inference"
+
+eval:
+  checkpoint_path: "checkpoints/unet_best.pt"
+  results_csv: "outputs/eval_results.csv"
